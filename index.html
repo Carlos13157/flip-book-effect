@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-EM">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Document</title>
-    <!-- Script de A-Frame -->
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <!-- Componente de entorno, útil para fondos y luces preestablecidas (opcional) -->
-    <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+    <!-- Script de Model Viewer -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
 </head>
 <body>
     <div class="flipbook">
@@ -22,13 +20,10 @@
             <img src="images/Imagen postal 1.jpeg" alt="">
             <small>foto 1</small>
         </div><!-- elemento 1 -->
-
-        <div class="page page-2-content"><!-- elemento 2 (Contenedor para el botón del modal) -->
-            <img src="images/Imagen postal 12.jpg" alt=""> <!-- Puedes mantener una imagen de vista previa si quieres -->
-            <button id="openModelModal">Ver Mapa 3D Interactivo</button>
-            <small>Haz clic para explorar el mapa</small>
+        <div><!-- elemento 2 -->
+            <img src="images/Imagen postal 12.jpg" alt="">
+            <small>foto 2</small>
         </div><!-- elemento 2 -->
-
         <div><!-- elemento 3 -->
             <img src="images/Imagen postal 7.jpeg" alt="">
             <small>foto 3</small>
@@ -36,21 +31,10 @@
         <div class="hard"></div>
         <div class="hard">Gracias por leer <small>Territorios que renacen</small></div>
     </div>
-
-    <!-- El Modal para el Modelo 3D -->
-    <div id="modelModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <div id="aframe-scene-container">
-                <!-- La escena de A-Frame se cargará aquí dinámicamente -->
-            </div>
-        </div>
-    </div>
-
     <script src="https://code.jquery.com/jquery-4.0.0.min.js" integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
     <script src="turn.js"></script>
-    <script src="script.js">
-        
+    <script>
+        $('.flipbook').turn();
     </script>
 </body>
 </html>
