@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+    <!-- Script de Model Viewer -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+</head>
+<body>
+    <div class="flipbook">
+        <div class="hard">Montes de maria <small>Territorios que renacen</small></div>
+        <div class="hard"></div>
+        <div>
+            <small>Vamos a leer sobre los montes de maria</small>
+            <small>Presta atencion</small>
+        </div>
+        <div> <!-- elemento 1 -->
+            <img src="images/Imagen postal 1.jpeg" alt="">
+            <small>foto 1</small>
+        </div><!-- elemento 1 -->
+        <div><!-- elemento 2 -->
+            <model-viewer src="MapaTEXTURAS.glb" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" poster="poster.webp" shadow-intensity="2" environment-image="aircraft_workshop_01_1k.hdr" camera-orbit="320.3deg 61.78deg 4.34m" field-of-view="22.98deg">
+                <button class="Hotspot" slot="hotspot-1" data-position="-0.5658613441981905m 0.04238015156387115m -0.3162230327651009m" data-normal="0.14970458823723132m 0.7249646774201968m 0.6723204241682318m" data-visibility-attribute="visible">
+                    <div class="HotspotAnnotation">Pueblo 1</div>
+                </button><button class="Hotspot" slot="hotspot-2" data-position="0.45084201614502306m 0.02181183046381171m 0.08901157527637892m" data-normal="0.14884347883500165m 0m -0.9888607681611676m" data-visibility-attribute="visible">
+                    <div class="HotspotAnnotation">pueblo 2</div>
+                </button>
+                <div class="progress-bar hide" slot="progress-bar">
+                    <div class="update-bar"></div>
+                </div>
+                <button slot="ar-button" id="ar-button">
+                    View in your space
+                </button>
+                <div id="ar-prompt">
+                    <img src="https://modelviewer.dev/shared-assets/icons/hand.png">
+                </div>
+            </model-viewer>
+            <small>foto 2</small>
+        </div><!-- elemento 2 -->
+        <div><!-- elemento 3 -->
+            <img src="images/Imagen postal 7.jpeg" alt="">
+            <small>foto 3</small>
+        </div> <!-- elemento 3 -->
+        <div class="hard"></div>
+        <div class="hard">Gracias por leer <small>Territorios que renacen</small></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js" integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
+    <script src="turn.js"></script>
+    <script>
+        $('.flipbook').turn();
+    </script>
+</body>
+</html>
