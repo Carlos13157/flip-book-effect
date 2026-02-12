@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Document</title>
-    <!-- Script de Model Viewer -->
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+    <!-- Script de A-Frame -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <!-- Incluir A-Frame AR.js si lo necesitas para AR basado en marcadores -->
+    <!-- <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script> -->
 </head>
 <body>
     <div class="flipbook">
@@ -20,25 +22,13 @@
             <img src="images/Imagen postal 1.jpeg" alt="">
             <small>foto 1</small>
         </div><!-- elemento 1 -->
-        <div><!-- elemento 2 -->
-            <model-viewer src="MapaTEXTURAS.glb" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" poster="poster.webp" shadow-intensity="2" environment-image="aircraft_workshop_01_1k.hdr" camera-orbit="320.3deg 61.78deg 4.34m" field-of-view="22.98deg">
-                <button class="Hotspot" slot="hotspot-1" data-position="-0.5658613441981905m 0.04238015156387115m -0.3162230327651009m" data-normal="0.14970458823723132m 0.7249646774201968m 0.6723204241682318m" data-visibility-attribute="visible">
-                    <div class="HotspotAnnotation">Pueblo 1</div>
-                </button><button class="Hotspot" slot="hotspot-2" data-position="0.45084201614502306m 0.02181183046381171m 0.08901157527637892m" data-normal="0.14884347883500165m 0m -0.9888607681611676m" data-visibility-attribute="visible">
-                    <div class="HotspotAnnotation">pueblo 2</div>
-                </button>
-                <div class="progress-bar hide" slot="progress-bar">
-                    <div class="update-bar"></div>
-                </div>
-                <button slot="ar-button" id="ar-button">
-                    View in your space
-                </button>
-                <div id="ar-prompt">
-                    <img src="https://modelviewer.dev/shared-assets/icons/hand.png">
-                </div>
-            </model-viewer>
-            <small>foto 2</small>
+
+        <div class="page page-2-content"><!-- elemento 2 (Contenedor para el botón del modal) -->
+            <img src="images/Imagen postal 12.jpg" alt=""> <!-- Puedes mantener una imagen de vista previa si quieres -->
+            <button id="openModelModal">Ver Modelo 3D Interactivo</button>
+            <small>Haz clic para explorar el mapa</small>
         </div><!-- elemento 2 -->
+
         <div><!-- elemento 3 -->
             <img src="images/Imagen postal 7.jpeg" alt="">
             <small>foto 3</small>
@@ -46,10 +36,83 @@
         <div class="hard"></div>
         <div class="hard">Gracias por leer <small>Territorios que renacen</small></div>
     </div>
+
+    <!-- El Modal para el Modelo 3D -->
+    <div id="modelModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div id="aframe-scene-container">
+                <!-- La escena de A-Frame se cargará/inicializará aquí -->
+                <!-- Es importante inicializarla solo cuando el modal se abre si quieres ahorrar recursos -->
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-4.0.0.min.js" integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
     <script src="turn.js"></script>
     <script>
         $('.flipbook').turn();
+
+        // Lógica del Modal
+        const modelModal = document.getElementById('modelModal');
+        const openModelButton = document.getElementById('openModelModal');
+        const closeButton = document.getElementsByClassName('close-button')[0];
+        const aframeSceneContainer = document.getElementById('aframe-scene-container');
+
+        let aframeScene = null; // Variable para almacenar la escena A-Frame
+
+        function createAFrameScene() {
+            // Si la escena ya existe, no la crees de nuevo
+            if (aframeScene) return;
+
+            aframeSceneContainer.innerHTML = `
+                <a-scene embedded vr-mode-ui="enabled: false" style="width: 100%; height: 100%;">
+                    <a-assets>
+                        <a-asset-item id="mapa-glb" src="MapaTEXTURAS.glb"></a-asset-item>
+                    </a-assets>
+
+                    <a-entity gltf-model="#mapa-glb"
+                              position="0 0 -3"
+                              rotation="0 0 0"
+                              scale="1 1 1"></a-entity>
+
+                    <a-entity camera look-controls wasd-controls position="0 1.6 0"></a-entity>
+
+                    <a-entity light="type: ambient; color: #BBB"></a-entity>
+                    <a-entity light="type: directional; color: #FFF; intensity: 0.6" position="-0.5 1 1"></a-entity>
+
+                    <!-- Botón de AR de A-Frame aparecerá automáticamente si el dispositivo es compatible con WebXR -->
+                </a-scene>
+            `;
+            // Almacena la referencia a la escena recién creada
+            aframeScene = aframeSceneContainer.querySelector('a-scene');
+        }
+
+        function destroyAFrameScene() {
+            // Elimina la escena A-Frame del DOM para liberar recursos
+            if (aframeScene) {
+                aframeScene.parentNode.removeChild(aframeScene);
+                aframeScene = null;
+                aframeSceneContainer.innerHTML = ''; // Asegurarse de que esté vacío
+            }
+        }
+
+        openModelButton.onclick = function() {
+            modelModal.style.display = "block";
+            createAFrameScene(); // Crear la escena cuando el modal se abre
+        }
+
+        closeButton.onclick = function() {
+            modelModal.style.display = "none";
+            destroyAFrameScene(); // Destruir la escena cuando el modal se cierra
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modelModal) {
+                modelModal.style.display = "none";
+                destroyAFrameScene(); // Destruir la escena si se hace clic fuera del modal
+            }
+        }
     </script>
 </body>
 </html>
