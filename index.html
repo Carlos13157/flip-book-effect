@@ -43,6 +43,7 @@
             <span class="close-button">&times;</span>
             <div id="aframe-scene-container">
                 <!-- La escena de A-Frame se cargará/inicializará aquí -->
+                <!-- Es importante inicializarla solo cuando el modal se abre si quieres ahorrar recursos -->
             </div>
         </div>
     </div>
@@ -52,22 +53,20 @@
     <script>
         $('.flipbook').turn();
 
+        // Lógica del Modal
         const modelModal = document.getElementById('modelModal');
         const openModelButton = document.getElementById('openModelModal');
         const closeButton = document.getElementsByClassName('close-button')[0];
         const aframeSceneContainer = document.getElementById('aframe-scene-container');
 
-        let aframeScene = null;
+        let aframeScene = null; // Variable para almacenar la escena A-Frame
 
         function createAFrameScene() {
+            // Si la escena ya existe, no la crees de nuevo
             if (aframeScene) return;
 
             aframeSceneContainer.innerHTML = `
-                <a-scene embedded
-                         vr-mode-ui="enabled: false"
-                         ar-mode-ui="enabled: true" <!-- Habilita el botón de AR -->
-                         renderer="antialias: true; physicallyCorrectLights: true; colorManagement: true;"
-                         style="width: 100%; height: 100%;">
+                <a-scene embedded vr-mode-ui="enabled: false" style="width: 100%; height: 100%;">
                     <a-assets>
                         <a-asset-item id="mapa-glb" src="MapaTEXTURAS.glb"></a-asset-item>
                     </a-assets>
@@ -82,37 +81,36 @@
                     <a-entity light="type: ambient; color: #BBB"></a-entity>
                     <a-entity light="type: directional; color: #FFF; intensity: 0.6" position="-0.5 1 1"></a-entity>
 
+                    <!-- Botón de AR de A-Frame aparecerá automáticamente si el dispositivo es compatible con WebXR -->
                 </a-scene>
             `;
+            // Almacena la referencia a la escena recién creada
             aframeScene = aframeSceneContainer.querySelector('a-scene');
         }
 
         function destroyAFrameScene() {
+            // Elimina la escena A-Frame del DOM para liberar recursos
             if (aframeScene) {
-                // Para asegurar una limpieza completa, removemos el componente de escena A-Frame
-                // antes de eliminar el elemento del DOM.
-                aframeScene.pause();
-                aframeScene.innerHTML = ''; // Limpiar el contenido interno
-                aframeScene.remove(); // Eliminar el elemento de la escena del DOM
+                aframeScene.parentNode.removeChild(aframeScene);
                 aframeScene = null;
-                aframeSceneContainer.innerHTML = ''; // Asegurarse de que el contenedor esté vacío
+                aframeSceneContainer.innerHTML = ''; // Asegurarse de que esté vacío
             }
         }
 
         openModelButton.onclick = function() {
-            modelModal.style.display = "flex"; // Usar flex para centrar
-            createAFrameScene();
+            modelModal.style.display = "block";
+            createAFrameScene(); // Crear la escena cuando el modal se abre
         }
 
         closeButton.onclick = function() {
             modelModal.style.display = "none";
-            destroyAFrameScene();
+            destroyAFrameScene(); // Destruir la escena cuando el modal se cierra
         }
 
         window.onclick = function(event) {
             if (event.target == modelModal) {
                 modelModal.style.display = "none";
-                destroyAFrameScene();
+                destroyAFrameScene(); // Destruir la escena si se hace clic fuera del modal
             }
         }
     </script>
