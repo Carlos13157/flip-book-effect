@@ -9,54 +9,80 @@ $('.flipbook').turn();
         let aframeScene = null; // Variable para almacenar la escena A-Frame
 
         function createAFrameScene() {
-            // Si la escena ya existe, no la crees de nuevo
             if (aframeScene) return;
 
             aframeSceneContainer.innerHTML = `
                 <a-scene embedded
-                         ar-mode-ui="enabled: true"  <!-- Asegura que el botón AR se muestre si es compatible -->
-                         vr-mode-ui="enabled: false" <!-- Deshabilita el botón VR si no lo necesitas -->
-                         style="width: 100%; height: 100%;"
-                         shadow="type: pcfsoft"  <!-- Sombras para mejor realismo -->
-                         renderer="logarithmicDepthBuffer: true; antialias: true;"> <!-- Mejoras de renderizado -->
+                         ar-mode-ui="enabled: true"         <!-- Muestra el botón AR si compatible -->
+                         vr-mode-ui="enabled: false"        <!-- NUNCA muestra el botón VR -->
+                         renderer="logarithmicDepthBuffer: true; antialias: true;"
+                         shadow="type: pcfsoft"
+                         style="width: 100%; height: 100%;">
 
                     <a-assets>
                         <a-asset-item id="mapa-glb" src="MapaTEXTURAS.glb"></a-asset-item>
-                        <!-- Puedes añadir un environment map si tienes uno para la iluminación, como en model-viewer -->
-                        <!-- <img id="sky" src="path/to/your/sky.hdr" crossorigin="anonymous"> -->
                     </a-assets>
+
+                    <!-- Cámara con controles de arrastrar y rotar (look-controls) y zoom (mouse-wheel-zoom) -->
+                    <!-- Necesitamos el componente mouse-wheel-zoom (ver más abajo) para el zoom con rueda del ratón -->
+                    <a-entity camera
+                              position="0 1.6 4" <!-- Posición inicial de la cámara para que el modelo esté a la vista -->
+                              look-controls="reverseMouseDrag: true"  <!-- Permite arrastrar para rotar -->
+                              mouse-wheel-zoom="min: 1; max: 10; factor: 0.1"> <!-- Componente para zoom -->
+                    </a-entity>
 
                     <!-- Modelo GLB -->
                     <a-entity gltf-model="#mapa-glb"
                               id="my-model"
-                              position="0 0 0"
+                              position="0 1 0" <!-- Ajusta esta posición para centrar tu modelo -->
                               scale="1 1 1"
-                              shadow></a-entity> <!-- Habilita sombras en el modelo -->
+                              shadow></a-entity>
 
-                    <!-- Cámara con controles de órbita (como en model-viewer) -->
-                    <a-entity camera
-                              orbit-controls="target: #my-model; minDistance: 1; maxDistance: 10; initialPosition: 0 1.5 4;"
-                              position="0 1.6 0"></a-entity> <!-- Posición inicial de la cámara -->
+                    <!-- Entorno con luces (similar al ejemplo de A-Frame model-viewer) -->
+                    <a-entity environment="preset: default;
+                                           lighting: point;
+                                           shadow: true;
+                                           lightPosition: 0 5 0;"></a-entity>
 
-                    <!-- Luces -->
-                    <a-entity light="type: ambient; color: #BBB"></a-entity>
-                    <a-entity light="type: directional; color: #FFF; intensity: 0.6; castShadow: true" position="-0.5 1 1"></a-entity>
-                    <!-- Puedes añadir más luces si el modelo lo requiere, por ejemplo una hemisferica o una de foco -->
-
-                    <!-- Un plano para recibir sombras (opcional, para ver sombras en el "suelo") -->
-                    <!-- <a-plane rotation="-90 0 0" width="10" height="10" color="#7BC8A4" shadow="receive: true"></a-plane> -->
+                    <!-- Puedes agregar luces adicionales si el modelo lo requiere -->
+                    <!-- <a-entity light="type: ambient; color: #BBB"></a-entity> -->
+                    <!-- <a-entity light="type: directional; color: #FFF; intensity: 0.6; castShadow: true" position="-0.5 1 1"></a-entity> -->
 
                 </a-scene>
             `;
             aframeScene = aframeSceneContainer.querySelector('a-scene');
+
+            // Añadir el componente de zoom con rueda de ratón (necesario para el zoom)
+            // Este es un componente simple, puedes añadirlo a tu JS o como un archivo aparte
+            if (!AFRAME.components['mouse-wheel-zoom']) {
+                 AFRAME.registerComponent('mouse-wheel-zoom', {
+                    schema: {
+                        property: {type: 'string', default: 'position.z'},
+                        min: {type: 'number', default: 1},
+                        max: {type: 'number', default: 10},
+                        factor: {type: 'number', default: 0.1}
+                    },
+                    init: function () {
+                        this.onWheel = this.onWheel.bind(this);
+                        window.addEventListener('wheel', this.onWheel);
+                    },
+                    onWheel: function (evt) {
+                        let currentPos = this.el.object3D.position.z;
+                        let newPos = currentPos + evt.deltaY * this.data.factor;
+                        newPos = Math.max(this.data.min, Math.min(this.data.max, newPos));
+                        this.el.object3D.position.z = newPos;
+                    },
+                    remove: function () {
+                        window.removeEventListener('wheel', this.onWheel);
+                    }
+                });
+            }
         }
 
         function destroyAFrameScene() {
             if (aframeScene) {
-                // Detener la escena de A-Frame antes de eliminarla
-                // Esto es importante para liberar listeners y recursos correctamente
-                aframeScene.pause();
-                aframeScene.remove(); // Un método más limpio para eliminar la escena del DOM
+                aframeScene.pause(); // Pausar la escena
+                aframeScene.remove(); // Eliminar la escena del DOM
                 aframeScene = null;
                 aframeSceneContainer.innerHTML = '';
             }
